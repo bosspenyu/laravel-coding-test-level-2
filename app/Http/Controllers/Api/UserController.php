@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -17,7 +18,7 @@ class UserController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $users = User::paginate(15);
+        $users = User::all();
         return response()->json($users);
 
     }
@@ -36,10 +37,11 @@ class UserController extends Controller
     /**
      * @param UserRequest $request
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function store(UserRequest $request): JsonResponse
     {
-
+        $this->authorize('create-delete-users');
         try {
 
             $user = new User();
@@ -107,9 +109,11 @@ class UserController extends Controller
     /**
      * @param $id
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function destroy($id): JsonResponse
     {
+        $this->authorize('create-delete-users');
         try {
 
             User::find($id)->delete();
